@@ -23,7 +23,7 @@ var validate = validator.New()
 
 func GetFoods() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		recordPerPage, err := strconv.Atoi(ctx.Query("recordPerPage"))
@@ -38,30 +38,30 @@ func GetFoods() gin.HandlerFunc {
 
 		startIndex, err := strconv.Atoi(ctx.Query("startIndex"))
 		if err != nil || startIndex < 0 {
-			startIndex = (page-1)*recordPerPage
+			startIndex = (page - 1) * recordPerPage
 		}
 
-		matchStage := bson.D{{Key:"%match", Value:bson.D{{}}}}
+		matchStage := bson.D{{Key: "%match", Value: bson.D{{}}}}
 		groupStage := bson.D{{
-			Key:"$group", 
-			Value:bson.D{
-				{Key:"_id", Value:bson.D{{Key:"_id", Value:"null"}}}, 
-				{Key:"total_count", Value:bson.D{{Key:"$sum", Value:1}}}, 
-				{Key:"data", Value:bson.D{{Key:"$push", Value:"$$ROOT"}}},
+			Key: "$group",
+			Value: bson.D{
+				{Key: "_id", Value: bson.D{{Key: "_id", Value: "null"}}},
+				{Key: "total_count", Value: bson.D{{Key: "$sum", Value: 1}}},
+				{Key: "data", Value: bson.D{{Key: "$push", Value: "$$ROOT"}}},
 			}}}
 		projectStage := bson.D{{
-			Key:"$project", 
-			Value:bson.D{
-				{Key:"_id", Value:0},
-				{Key:"total_count", Value:1},
-				{Key:"food_items", Value:bson.D{{Key:"$slice", Value:[]interface{} {"$data", startIndex, recordPerPage}}}},
+			Key: "$project",
+			Value: bson.D{
+				{Key: "_id", Value: 0},
+				{Key: "total_count", Value: 1},
+				{Key: "food_items", Value: bson.D{{Key: "$slice", Value: []interface{}{"$data", startIndex, recordPerPage}}}},
 			}}}
 		result, err := foodCollection.Aggregate(c, mongo.Pipeline{
 			matchStage, groupStage, projectStage,
 		})
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error":"error occured while listing food items"})
-			return 
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing food items"})
+			return
 		}
 
 		var allFoods []bson.M
@@ -75,7 +75,7 @@ func GetFoods() gin.HandlerFunc {
 
 func GetFood() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		foodId := ctx.Param("food_id")
@@ -83,7 +83,7 @@ func GetFood() gin.HandlerFunc {
 
 		err := foodCollection.FindOne(c, bson.M{"food_id": foodId}).Decode(&food)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error":"error occured while fetching the food item"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while fetching the food item"})
 		}
 
 		ctx.JSON(http.StatusOK, food)
@@ -92,27 +92,27 @@ func GetFood() gin.HandlerFunc {
 
 func CreateFood() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var menu models.Menu
 		var food models.Food
 
 		if err := ctx.BindJSON(&food); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
-			return 
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
 
 		validationErr := validate.Struct(food)
 		if validationErr != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error":validationErr.Error()})
-			return 
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			return
 		}
 
 		err := menuCollection.FindOne(c, bson.M{"menu_id": food.Menu_id}).Decode(&menu)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error":"menu was not found"})
-			return 
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "menu was not found"})
+			return
 		}
 
 		food.Created_at = time.Now().UTC()
@@ -124,8 +124,8 @@ func CreateFood() gin.HandlerFunc {
 
 		result, insertErr := foodCollection.InsertOne(c, food)
 		if insertErr != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error":"food item was not created"})
-			return 
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "food item was not created"})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, result)
@@ -134,7 +134,7 @@ func CreateFood() gin.HandlerFunc {
 
 func UpdateFood() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var menu models.Menu
@@ -142,8 +142,8 @@ func UpdateFood() gin.HandlerFunc {
 		foodId := ctx.Param("food_id")
 
 		if err := ctx.BindJSON(&food); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
-			return 
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
 
 		var updateObj primitive.D
@@ -159,12 +159,12 @@ func UpdateFood() gin.HandlerFunc {
 		if food.Menu_id != nil {
 			err := menuCollection.FindOne(c, bson.M{"menu_id": food.Menu_id}).Decode(&menu)
 			if err != nil {
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error":"menu was not found"})
-				return 
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "menu was not found"})
+				return
 			}
 			updateObj = append(updateObj, bson.E{Key: "menu_id", Value: food.Menu_id})
 		}
-		
+
 		food.Updated_at = time.Now().UTC()
 		updateObj = append(updateObj, bson.E{Key: "updated_at", Value: food.Updated_at})
 
@@ -198,5 +198,5 @@ func round(num float64) int {
 
 func toFixed(num float64, precision int) float64 {
 	output := math.Pow(10, float64(precision))
-	return float64(round(num * output)) / output
+	return float64(round(num*output)) / output
 }

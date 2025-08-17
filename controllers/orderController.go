@@ -19,7 +19,7 @@ var orderCollection *mongo.Collection = database.OpenCollection(database.Client,
 
 func GetOrders() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		result, err := orderCollection.Find(c, bson.M{})
@@ -31,7 +31,7 @@ func GetOrders() gin.HandlerFunc {
 		var allorders []bson.M
 		if err = result.All(c, &allorders); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error while decoding orders"})
-			return 
+			return
 		}
 		ctx.JSON(http.StatusOK, allorders)
 	}
@@ -39,7 +39,7 @@ func GetOrders() gin.HandlerFunc {
 
 func GetOrder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		orderId := ctx.Param("order_id")
@@ -60,7 +60,7 @@ func GetOrder() gin.HandlerFunc {
 
 func CreateOrder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var order models.Order
@@ -102,7 +102,7 @@ func CreateOrder() gin.HandlerFunc {
 
 func UpdateOrder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var table models.Table
@@ -152,7 +152,7 @@ func UpdateOrder() gin.HandlerFunc {
 }
 
 func OrderItemOrderCreator(order models.Order) string {
-	c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	order.Created_at = time.Now().UTC()

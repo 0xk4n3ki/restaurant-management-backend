@@ -30,7 +30,7 @@ var invoiceCollection *mongo.Collection = database.OpenCollection(database.Clien
 
 func GetInvoices() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		result, err := invoiceCollection.Find(c, bson.M{})
@@ -49,7 +49,7 @@ func GetInvoices() gin.HandlerFunc {
 
 func GetInvoice() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		invoiceId := ctx.Param("invoice_id")
@@ -82,19 +82,19 @@ func GetInvoice() gin.HandlerFunc {
 
 func CreateInvoice() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var invoice models.Invoice
 		if err := ctx.BindJSON(&invoice); err != nil {
-			return 
+			return
 		}
 
 		var order models.Order
-		err := orderCollection.FindOne(c, bson.M{"order_id":invoice.Order_id}).Decode(&order)
+		err := orderCollection.FindOne(c, bson.M{"order_id": invoice.Order_id}).Decode(&order)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "order was not found"})
-			return 
+			return
 		}
 
 		status := "PENDING"
@@ -112,13 +112,13 @@ func CreateInvoice() gin.HandlerFunc {
 		validationErr := validate.Struct(invoice)
 		if validationErr != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
-			return 
+			return
 		}
 
 		result, insertErr := invoiceCollection.InsertOne(c, invoice)
 		if insertErr != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "invoice item not created"})
-			return 
+			return
 		}
 
 		ctx.JSON(http.StatusOK, result)
@@ -127,7 +127,7 @@ func CreateInvoice() gin.HandlerFunc {
 
 func UpdateInvoice() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var invoice models.Invoice

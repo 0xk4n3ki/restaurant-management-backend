@@ -18,7 +18,7 @@ var tableCollection *mongo.Collection = database.OpenCollection(database.Client,
 
 func GetTables() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		result, err := tableCollection.Find(c, bson.M{})
@@ -38,7 +38,7 @@ func GetTables() gin.HandlerFunc {
 
 func GetTable() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		tableId := ctx.Param("table_id")
@@ -55,7 +55,7 @@ func GetTable() gin.HandlerFunc {
 
 func CreateTable() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var table models.Table
@@ -88,7 +88,7 @@ func CreateTable() gin.HandlerFunc {
 
 func UpdateTable() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var table models.Table

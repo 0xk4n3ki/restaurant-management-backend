@@ -24,7 +24,7 @@ var orderItemCollection *mongo.Collection = database.OpenCollection(database.Cli
 
 func GetOrderItems() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		result, err := orderItemCollection.Find(c, bson.M{})
@@ -43,7 +43,7 @@ func GetOrderItems() gin.HandlerFunc {
 
 func GetOrderItem() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		orderItemId := ctx.Param("order_item_id")
@@ -72,7 +72,7 @@ func GetOrderItemsByOrder() gin.HandlerFunc {
 }
 
 func ItemsByOrder(id string) (OrderItems []primitive.M, err error) {
-	c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "order_id", Value: id}}}}
@@ -174,7 +174,7 @@ func ItemsByOrder(id string) (OrderItems []primitive.M, err error) {
 
 func CreateOrderItem() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		var orderItemPack OrderItemPack
@@ -222,7 +222,7 @@ func CreateOrderItem() gin.HandlerFunc {
 
 func UpdateOrderItem() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		var orderItem models.OrderItem
