@@ -19,13 +19,13 @@ var orderCollection *mongo.Collection = database.OpenCollection(database.Client,
 
 func GetOrders() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		result, err := orderCollection.Find(c, bson.M{})
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing order items"})
-			return 
+			return
 		}
 
 		var allorders []bson.M
@@ -38,7 +38,7 @@ func GetOrders() gin.HandlerFunc {
 
 func GetOrder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		orderId := ctx.Param("order_id")
@@ -47,7 +47,7 @@ func GetOrder() gin.HandlerFunc {
 		err := orderCollection.FindOne(c, bson.M{"order_id": orderId}).Decode(&order)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while fetching order"})
-			return 
+			return
 		}
 		ctx.JSON(http.StatusOK, order)
 	}
@@ -55,19 +55,19 @@ func GetOrder() gin.HandlerFunc {
 
 func CreateOrder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		var order models.Order
 		if err := ctx.BindJSON(&order); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return 
+			return
 		}
 
 		validationErr := validate.Struct(order)
 		if validationErr != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
-			return 
+			return
 		}
 
 		var table models.Table
@@ -75,7 +75,7 @@ func CreateOrder() gin.HandlerFunc {
 			err := tableCollection.FindOne(c, bson.M{"table_id": order.Table_id}).Decode(&table)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "table was not found"})
-				return 
+				return
 			}
 		}
 
@@ -88,7 +88,7 @@ func CreateOrder() gin.HandlerFunc {
 		result, insertErr := orderCollection.InsertOne(c, order)
 		if insertErr != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "order item was not created"})
-			return 
+			return
 		}
 
 		ctx.JSON(http.StatusOK, result)
@@ -97,7 +97,7 @@ func CreateOrder() gin.HandlerFunc {
 
 func UpdateOrder() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		var table models.Table
@@ -105,7 +105,7 @@ func UpdateOrder() gin.HandlerFunc {
 
 		if err := ctx.BindJSON(&order); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return 
+			return
 		}
 
 		orderId := ctx.Param("order_id")
@@ -115,7 +115,7 @@ func UpdateOrder() gin.HandlerFunc {
 			err := menuCollection.FindOne(c, bson.M{"table_id": order.Table_id}).Decode(&table)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "table not found"})
-				return 
+				return
 			}
 			updateObj = append(updateObj, bson.E{Key: "order_id", Value: order.Order_id})
 		}
@@ -139,7 +139,7 @@ func UpdateOrder() gin.HandlerFunc {
 		)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "order item update failed"})
-			return 
+			return
 		}
 
 		ctx.JSON(http.StatusOK, result)
@@ -155,7 +155,6 @@ func OrderItemOrderCreator(order models.Order) string {
 
 	order.ID = primitive.NewObjectID()
 	order.Order_id = order.ID.Hex()
-
 
 	orderCollection.InsertOne(c, order)
 

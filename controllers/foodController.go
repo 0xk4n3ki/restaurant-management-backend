@@ -23,7 +23,7 @@ var validate = validator.New()
 
 func GetFoods() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		recordPerPage, err := strconv.Atoi(ctx.Query("recordPerPage"))
@@ -75,7 +75,7 @@ func GetFoods() gin.HandlerFunc {
 
 func GetFood() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		foodId := ctx.Param("food_id")
@@ -92,7 +92,7 @@ func GetFood() gin.HandlerFunc {
 
 func CreateFood() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		var menu models.Menu
@@ -134,7 +134,7 @@ func CreateFood() gin.HandlerFunc {
 
 func UpdateFood() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		var menu models.Menu

@@ -19,7 +19,7 @@ var menuCollection *mongo.Collection = database.OpenCollection(database.Client, 
 
 func GetMenus() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		result, err := menuCollection.Find(c, bson.M{})
@@ -37,7 +37,7 @@ func GetMenus() gin.HandlerFunc {
 
 func GetMenu() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		menuId := ctx.Param("menu_id")
@@ -54,7 +54,7 @@ func GetMenu() gin.HandlerFunc {
 
 func CreateMenu() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		var menu models.Menu
@@ -91,7 +91,7 @@ func inTimeSpan(start, end, check time.Time) bool {
 
 func UpdateMenu() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(ctx.Request.Context(), 100*time.Second)
 		defer cancel()
 
 		var menu models.Menu
@@ -129,7 +129,7 @@ func UpdateMenu() gin.HandlerFunc {
 			opt := options.UpdateOptions{
 				Upsert: &upsert,
 			}
-			result, err := menuCollection.UpdateOne(c, filter, bson.D{{"$set", updateObj}}, &opt)
+			result, err := menuCollection.UpdateOne(c, filter, bson.D{{Key: "$set", Value: updateObj}}, &opt)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "menu update failed"})
 				return
