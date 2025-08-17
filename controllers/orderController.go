@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
