@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -30,7 +31,8 @@ func GetOrders() gin.HandlerFunc {
 
 		var allorders []bson.M
 		if err = result.All(c, &allorders); err != nil {
-			log.Fatal(err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error while decoding orders"})
+			return 
 		}
 		ctx.JSON(http.StatusOK, allorders)
 	}
@@ -45,8 +47,12 @@ func GetOrder() gin.HandlerFunc {
 		var order models.Order
 
 		err := orderCollection.FindOne(c, bson.M{"order_id": orderId}).Decode(&order)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
+			return
+		}
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while fetching order"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "error while fetching order"})
 			return
 		}
 		ctx.JSON(http.StatusOK, order)
