@@ -13,7 +13,7 @@ func Authentication() gin.HandlerFunc {
 		if clientToken == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 			ctx.Abort()
-			return 
+			return
 		}
 
 		claims, msg := helpers.ValidateToken(clientToken)

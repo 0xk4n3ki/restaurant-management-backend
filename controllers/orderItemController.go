@@ -239,7 +239,7 @@ func UpdateOrderItem() gin.HandlerFunc {
 			updateObj = append(updateObj, bson.E{Key: "quantity", Value: *orderItem.Quantity})
 		}
 		if orderItem.Food_id != nil {
-			updateObj = append(updateObj, bson.E{Key: "food_id", Value: *&orderItem.Food_id})
+			updateObj = append(updateObj, bson.E{Key: "food_id", Value: orderItem.Food_id})
 		}
 
 		orderItem.Updated_at = time.Now().UTC()

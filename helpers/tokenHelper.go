@@ -12,12 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
 type SignedDetails struct {
-	Email string
+	Email      string
 	First_name string
-	Last_name string
-	Uid string
+	Last_name  string
+	Uid        string
 	jwt.StandardClaims
 }
 
@@ -27,17 +26,17 @@ var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
 func GenerateAllTokens(email, firstName, lastName, uid string) (signedToken, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
-		Email: email,
+		Email:      email,
 		First_name: firstName,
-		Last_name: lastName,
-		Uid: uid,
+		Last_name:  lastName,
+		Uid:        uid,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(30*time.Minute).Unix(),
+			ExpiresAt: time.Now().Add(1 * time.Minute).Unix(),
 		},
 	}
 	refreshClaims := &SignedDetails{
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(24*time.Hour).Unix(),
+			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
 		},
 	}
 
@@ -59,9 +58,9 @@ func UpdateAllTokens(signedToken, signedRefreshToken, userId string) error {
 	defer cancel()
 
 	updateObj := bson.M{
-		"token": signedToken,
+		"token":         signedToken,
 		"refresh_token": signedRefreshToken,
-		"updated_at": time.Now().UTC(),
+		"updated_at":    time.Now().UTC(),
 	}
 
 	filter := bson.M{"user_id": userId}
