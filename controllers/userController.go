@@ -212,20 +212,25 @@ func VerifyPassword(providedPassword string, hashedPassword string) (bool, strin
 	return true, ""
 }
 
-
 func RefreshToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		refreshToken := ctx.GetHeader("refresh_token")
 		if refreshToken == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "refresh token required"})
-			return 
+			return
 		}
 
 		claims, msg := helpers.ValidateToken(refreshToken)
 		if msg != "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": msg})
-			return 
+			return
 		}
+
+		log.Printf("claims: %v\n", claims)
+		log.Printf("email: %v\n", claims.Email)
+		log.Printf("first name: %v\n", claims.First_name)
+		log.Printf("lasst name: %v\n", claims.Last_name)
+		log.Printf("uid: %v\n", claims.Uid)
 
 		newToken, newRefreshToken, _ := helpers.GenerateAllTokens(
 			claims.Email,
@@ -236,11 +241,11 @@ func RefreshToken() gin.HandlerFunc {
 
 		if err := helpers.UpdateAllTokens(newToken, newRefreshToken, claims.Uid); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update tokens"})
-			return 
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"token": newToken,
+			"token":         newToken,
 			"refresh_token": newRefreshToken,
 		})
 	}
