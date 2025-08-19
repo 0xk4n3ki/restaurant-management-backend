@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func DBinstance() *mongo.Client {
-	MongoDb := "mongodb://localhost:27017/restaurant-management"
+	MongoDb := os.Getenv("MONGODB_URL")
+	if MongoDb == "" {
+		MongoDb = "mongodb://localhost:27017/restaurant-management"
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -29,7 +33,7 @@ func DBinstance() *mongo.Client {
 var Client *mongo.Client = DBinstance()
 
 func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	collection := client.Database("restaurant").Collection(collectionName)
+	collection := client.Database("restaurant-management").Collection(collectionName)
 
 	return collection
 }
