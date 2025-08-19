@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -161,7 +162,10 @@ func OrderItemOrderCreator(order models.Order) string {
 	order.ID = primitive.NewObjectID()
 	order.Order_id = order.ID.Hex()
 
-	orderCollection.InsertOne(c, order)
+	_, err := orderCollection.InsertOne(c, order)
+	if err != nil {
+		log.Printf("failed to insert the order item")
+	}
 
 	return order.Order_id
 }

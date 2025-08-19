@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -33,5 +34,8 @@ func main() {
 	routes.OrderItemRoutes(router)
 	routes.InvoiceRoutes(router)
 
-	router.Run(":" + port)
+	err := router.Run(":" + port)
+	if err != nil {
+		log.Panic("failed to run the router")
+	}
 }
