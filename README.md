@@ -78,3 +78,21 @@ The repo includes automated workflows:
 - CodeQL Analysis (GitHub Advanced Security)
 - Docker Build & Push (to Docker Hub using access token)
 - Trivy Security Scan (scans built Docker images for vulnerabilities before pushing)
+
+### Screenshots
+
+Login
+
+<img alt="login" src="/images/login.png">
+
+Menus
+
+<img alt="menus" src="/images/menus.png">
+
+Create Menu
+
+<img alt="create menu" src="/images/createMenu.png">
+
+Create Food Item
+
+<img alt="create food item" src="/images/createFoodItem.png">
